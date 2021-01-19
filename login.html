@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oxygen&display=swap" rel="stylesheet">
+
+    <title>LFC Nerrons</title>
+</head>
+
+<body>
+    <div class="container-flow" id="app">
+        <div class="lfc-logo"> <img src="./images/Liverpool_FC.svg.png" alt="image of liverpool fc logo"></div>
+        <h3 class="text-center text-white pt-5">Welcome to LFC Nerrons</h3>
+        <div class="container">
+            <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+
+                        <!-- LOGIN FORM-->
+                        <div class="modal-body" id="loginForm">
+                            <form id="formupdate">
+                                <h3 class="text-center text-info">Login</h3>
+
+                                <div class="form-group">
+                                    <label for="userEmail" class="text-info">Username:</label>
+                                    <input type="text" class="form-control" name="userEmail" id="userEmail">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="userPswd" class="text-info">Password:</label>
+                                    <input type="password" class="form-control" name="userPswd" id="userPswd">
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="button" name="submit" class="btn btn-dark btn-md float-right"
+                                        value="Login" v-on:click="loginMeth">
+                                </div>
+
+                            </form>
+                        </div>
+                        <!--LOGIN FORM END -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                users: []
+                //currentloggedin
+            },
+            // methods
+            methods: {
+
+                loginMeth() {
+                    var login = {
+                        userEmail: $('#loginForm #userEmail').val(),
+                        userPswd: $('#loginForm #userPswd').val()
+                    };
+
+                    $.ajax({
+                        url: '/api/usersdata/', //is this the issue?
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(login),
+                        success: (users) => {
+
+                            sessionStorage.setItem('userEmail', JSON.stringify(users.userEmail))
+                            sessionStorage.setItem('userType', JSON.stringify(users.userType))
+                            sessionStorage.setItem('userId', JSON.stringify(users.userId))
+                        }
+
+                    });
+
+                    $.ajax({
+                        url: '/api/login/', // or maybe thiiis?????
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(login),
+                        success: (res) => {
+
+                            if (res == "Admin") {
+                                session.setItem('userEmail', JSON.stringify(login.userEmail))
+                                window.location.href = "http://localhost:3000/admin.html";
+                            }
+
+                            if (res == "Consumer") {
+                                session.setItem('userEmail', JSON.stringify(login.userEmail))
+                                window.location.href = "http://localhost:3000/questions.html";
+                            }
+
+                            if (res == "Contributor") {
+                                session.setItem('userEmail', JSON.stringify(login.userEmail))
+                                window.location.href = "http://localhost:3000/questions.html";
+                            }
+                        }
+                    })
+                },
+            },
+            mounted() {
+                var self = this;
+                $.getJSON("/api/users/", function (jsondata) {
+                    console.log(JSON.stringify(jsondata));
+                    self.users = jsondata;
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
